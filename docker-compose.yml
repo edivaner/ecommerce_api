@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço PHP-FPM para a aplicação
   app:
