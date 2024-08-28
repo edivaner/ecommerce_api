@@ -45,30 +45,44 @@ REDIS_PASSWORD
 REDIS_PORT
 ```
 
-
 Suba os containers do projeto
+```sh
+docker-compose up --build -d
+```
+ou
 ```sh
 docker-compose up -d
 ```
-
 
 Acesse o container app
 ```sh
 docker-compose exec app bash
 ```
 
-
 Instale as dependências do projeto
 ```sh
 composer install
 ```
-
 
 Gere a key do projeto Laravel
 ```sh
 php artisan key:generate
 ```
 
+Gere a migrate do projeto Laravel
+```sh
+php artisan migrate
+```
+
+Gere os seed do projeto Laravel (Opcional): serve para instanciar a popular o banco com dados iniciais.
+```sh
+php artisan db:seed
+```
+
+Para sair de dentro do container
+```sh
+exit
+```
 
 Acesse o projeto
 [http://localhost:8080](http://localhost:8080)
