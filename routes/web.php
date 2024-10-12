@@ -8,8 +8,7 @@ Route::get('/', function () {
 });
 
 // ROTAS DA API FICARÁ DENTRO DESTE BLOCO
-Route::prefix('api')->group(function () {
-    Route::get('/customers', [CustomerController::class, 'index']);
-    Route::post('/customers', [CustomerController::class, 'store']);
-    // Route::resource("/customers", CustomerController::class);
-});
+// Route::prefix('api')->group(function () {
+//     Route::post('/customers', [CustomerController::class, 'store'])->middleware('verifyCsrfToken');
+//     Route::get('/customers', [CustomerController::class, 'index']);
+// });
