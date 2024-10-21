@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Services\customerService;
+use App\Services\CustomerService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\DTO\customer\CreateCustomerDTO;
@@ -16,7 +16,7 @@ class CustomerController extends Controller
      * Display a listing of the resource.
      */
     public function __construct(
-        protected customerService $customerService
+        protected CustomerService $customerService
     ) {
     }
     

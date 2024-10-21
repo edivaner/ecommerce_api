@@ -7,7 +7,7 @@ use App\DTO\customer\UpdateCustomerDTO;
 use App\Repositories\Customer\CustomerRepositoryInterface;
 use stdClass;
 
-class customerService
+class CustomerService
 {
     public function __construct(
         protected CustomerRepositoryInterface $repositoryCustomer
