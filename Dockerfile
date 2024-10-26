@@ -31,3 +31,9 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Exponha a porta padrão do PHP-FPM
 EXPOSE 9000
+
+# Copiando configuracoes do INI do Xdebug caminho INI: /usr/local/etc/php/conf.d/xdebug.ini
+COPY ./docker/php/xdebug.ini "${PHP_INI_DIR}/conf.d/xdebug.ini"
+
+# Install xdebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
