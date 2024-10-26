@@ -6,6 +6,8 @@ use App\Repositories\Cart\CartEloquentORM;
 use App\Repositories\Cart\CartRepositoryInterface;
 use App\Repositories\Customer\CustomerEloquentORM;
 use App\Repositories\Customer\CustomerRepositoryInterface;
+use App\Repositories\Product\ProductEloquentORM;
+use App\Repositories\Product\ProductRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -18,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
         //
         $this->app->bind(CustomerRepositoryInterface::class, CustomerEloquentORM::class);
         $this->app->bind(CartRepositoryInterface::class, CartEloquentORM::class);
+        $this->app->bind(ProductRepositoryInterface::class, ProductEloquentORM::class);
 
     }
 

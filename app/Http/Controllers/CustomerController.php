@@ -50,20 +50,9 @@ class CustomerController extends Controller
 
             $request = (object) $request->toArray();
 
-            if(!isset($request->address['neighborhood']) OR $request->address['neighborhood'] == '') {
+            if (!isset($request->address['neighborhood']) OR $request->address['neighborhood'] == '') {
                 throw new \Exception('O campo neighborhood é obrigatório.');
             }
-    
-            $request->address = [
-                'street' => isset($request->address['street']) ? $request->address['street'] : null,
-                'neighborhood' => isset($request->address['neighborhood']) ? $request->address['neighborhood'] : null,
-                'number' => isset($request->address['number']) ? $request->address['number'] : null,
-                'city' => isset($request->address['city']) ? $request->address['city'] : null,
-                'reference' => isset($request->address['reference']) ? $request->address['reference'] : null,
-                // 'complement' => isset($request->address['complement']) ? $request->address['complement'] : null,
-                // 'state' => isset($request->address['state']) ? $request->address['state'] : null,
-                // 'zip_code' => isset($request->address['zip_code']) ? $request->address['zip_code'] : null
-            ];
 
             $customerCreated = $this->customerService->create(CreateCustomerDTO::makeFromRequest($request));
 

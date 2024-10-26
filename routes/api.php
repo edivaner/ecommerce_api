@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\CustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProductController;
 
 // ROTAS DA API FICARÁ DENTRO DESTE BLOCO
 
@@ -15,7 +16,12 @@ Route::put('/customers/{id}', [CustomerController::class, 'update']);
 Route::delete('/customers/{id}', [CustomerController::class, 'destroy']);
 
 // cart
-Route::get('/cart', function (Request $request) {
+Route::get('/carts', function (Request $request) {
     return 'teste';
 });
-Route::post('/cart', [CartController::class, 'store']);
+Route::post('/carts', [CartController::class, 'store']);
+
+
+//product
+Route::post('/products', [ProductController::class, 'store']);
+Route::get('/products', [ProductController::class, 'index']);

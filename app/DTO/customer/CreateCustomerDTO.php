@@ -14,8 +14,6 @@ class CreateCustomerDTO
 
     public static function makeFromRequest($request): self
     {
-        // dd($request);
-
         $self = new self(
             $request->user,
             $request->address,

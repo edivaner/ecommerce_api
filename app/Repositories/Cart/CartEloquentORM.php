@@ -41,7 +41,7 @@ class CartEloquentORM implements CartRepositoryInterface
         foreach ($dto->products as $product) {
             $this->itemCart->create([
                 'cart_id' => $cart->id,
-                'product' => $product['product_id'],
+                'product_id' => $product['product_id'],
                 'quantity' => $product['quantity']
             ]);
         }
