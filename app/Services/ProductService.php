@@ -32,7 +32,7 @@ class ProductService
         $product = $this->repositoryProduct->create($dto);
         if (!$product) return null;
 
-        return $product;
+        return $this->findOne((string)$product->id);
     }
 
     public function update(UpdateProductDTO $dto): stdClass|null

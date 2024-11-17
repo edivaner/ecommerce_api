@@ -1,22 +1,21 @@
 <?php
 
-namespace App\DTO\product;
+namespace App\DTO\department;
 
 
 
-class UpdateProductDTO
+class UpdateDepartmentDTO
 {
     public function __construct(
         public int $id,
-        public string $description
-    ) {
-    }
+        public string $name
+    ) {}
 
     public static function makeFromRequest($request, string $id = null)
     {
         return new self(
             $id ?? $request->id,
-            $request->description
+            $request->name
         );
     }
 }

@@ -6,22 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class Department extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'products';
+    protected $table = 'departments';
 
     protected $fillable = [
-        'description',
-        'ean',
-        'department_id',
-        'price'
+        'name'
     ];
-
-    public function stock()
-    {
-        return $this->belongsTo(Stock::class);
-    }
 }
