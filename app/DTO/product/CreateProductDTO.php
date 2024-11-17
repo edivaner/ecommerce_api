@@ -2,14 +2,14 @@
 
 namespace App\DTO\product;
 
-use Ramsey\Uuid\Type\Decimal;
-
 class CreateProductDTO
 {
     public function __construct(
-        public string $description,
+        public int $department_id,
         public string $ean,
-        public string $price
+        public string $description,
+        public string $price,
+        public string $quantity //TODO: Verificar melhor forma de tratar a quantidade
     ) {
     }
 
@@ -17,9 +17,11 @@ class CreateProductDTO
     {
 
         $self = new self(
-            $request->description,
+            $request->department_id,
             $request->ean,
-            $request->price
+            $request->description,
+            $request->price,
+            $request->quantity
         );
 
         return $self;
