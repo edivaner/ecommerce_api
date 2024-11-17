@@ -19,17 +19,27 @@ class CartEloquentORM implements CartRepositoryInterface
 
     public function getAll(string $filter = null): array
     {
-        return [];
+        return $this->cart
+            ->where(function ($query) use ($filter) {
+                if ($filter) {
+                    $query->where('id', $filter);
+                }
+            })
+            ->get()
+            ->toArray();
     }   
 
     public function findOne(string $id):null|stdClass
     {
-        return null;
+        $cart = $this->cart->find($id);
+        $cart->items = $this->itemCart->where('cart_id', $id)->get()->toArray();
+        if (!$cart) return null;
+        return (object) $cart->toArray();
     }
 
     public function delete(string $id): void
     {
-        // TODO: Implement delete() method.
+        $this->cart->findOrFail($id)->delete();
     }
 
     public function create(CreateCartDTO $dto): null|stdClass
@@ -42,7 +52,8 @@ class CartEloquentORM implements CartRepositoryInterface
             $this->itemCart->create([
                 'cart_id' => $cart->id,
                 'product' => $product['product_id'],
-                'quantity' => $product['quantity']
+                'quantity' => $product['quantity'],
+                'price' => 0
             ]);
         }
 

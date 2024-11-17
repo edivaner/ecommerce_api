@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ItemCart extends Model
+class OrderItem extends Model
 {
     use HasFactory;
-    use SoftDeletes;
+    // use SoftDeletes;
 
-    protected $table = 'cart_items';
+    protected $table = 'order_items';
 
     protected $fillable = [
-        'cart_id',
+        'order_id',
         'product',
         'quantity',
+        'price'
     ];
 
-    protected $hidden = ['id'];
 }
