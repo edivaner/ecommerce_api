@@ -74,7 +74,8 @@ class CustomerController extends Controller
     {
         try {
             $auth = Auth::user();
-            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode visualizar esse cliente'], 401);
+            if (!$auth) throw new \Exception('Necessário login');
+            if(($auth->id != $id) AND ($auth->role != 'admin')) throw new \Exception( 'Não autorizado. Você não pode visualizar esse cliente');
 
             $customer = $this->customerService->findOne($id);
             if (!$customer) return response()->json(['message' => 'Não foi possível encontrar esse cliente'], 404);
@@ -102,7 +103,8 @@ class CustomerController extends Controller
         try {
             DB::beginTransaction();
             $auth = Auth::user();
-            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode atualizar esse cliente'], 401);
+            if (!$auth) throw new \Exception('Necessário login');
+            if(($auth->id != $id) AND ($auth->role != 'admin')) throw new \Exception( 'Não autorizado. Você não pode atualizar esse cliente');
             
 
             $customer = $this->customerService->findOne($id);
@@ -127,7 +129,8 @@ class CustomerController extends Controller
         try {
             DB::beginTransaction();
             $auth = Auth::user();
-            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode deletar esse cliente'], 401);
+            if (!$auth) throw new \Exception('Necessário login');
+            if(($auth->id != $id) AND ($auth->role != 'admin')) throw new \Exception( 'Não autorizado. Você não pode deletar esse cliente');
             
             $customer = $this->customerService->findOne($id);
             if (!$customer) return response()->json(['error' => 'Não foi encontrado este cliente para ser excluido.'], 404);

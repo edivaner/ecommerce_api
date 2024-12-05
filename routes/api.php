@@ -11,6 +11,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\StaffController;
 
 // ROTAS DA API FICARÁ DENTRO DESTE BLOCO
 
@@ -18,6 +19,10 @@ use App\Http\Controllers\OrderItemController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
+
+// staffs
+Route::resource('/staff', StaffController::class)->only(['store', 'destroy', 'show', 'update'])->middleware(['auth:api','admin']);
+Route::get('/staff', [StaffController::class, 'index']);
 
 //customers
 Route::post('/customers', [CustomerController::class, 'store']);
