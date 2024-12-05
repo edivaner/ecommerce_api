@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\DTO\customer\CreateCustomerDTO;
 use App\DTO\customer\UpdateCustomerDTO;
+use App\Models\Order;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -71,6 +73,9 @@ class CustomerController extends Controller
     public function show(string $id)
     {
         try {
+            $auth = Auth::user();
+            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode visualizar esse cliente'], 401);
+
             $customer = $this->customerService->findOne($id);
             if (!$customer) return response()->json(['message' => 'Não foi possível encontrar esse cliente'], 404);
 
@@ -96,6 +101,9 @@ class CustomerController extends Controller
     {
         try {
             DB::beginTransaction();
+            $auth = Auth::user();
+            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode atualizar esse cliente'], 401);
+            
 
             $customer = $this->customerService->findOne($id);
             if (!$customer) return response()->json(['message' => 'Cliente não encontrado.'], 404);
@@ -118,7 +126,9 @@ class CustomerController extends Controller
     {
         try {
             DB::beginTransaction();
-
+            $auth = Auth::user();
+            if(($auth->id != $id) AND ($auth->role != 'admin')) return response()->json(['message' => 'Não autorizado. Você não pode deletar esse cliente'], 401);
+            
             $customer = $this->customerService->findOne($id);
             if (!$customer) return response()->json(['error' => 'Não foi encontrado este cliente para ser excluido.'], 404);
 

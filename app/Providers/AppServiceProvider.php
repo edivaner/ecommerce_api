@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\AdminMiddleware;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Policies\CartBelongsUserPolicy;
+use App\Policies\OrderBelongsUserPolicy;
 use App\Repositories\Cart\CartEloquentORM;
 use App\Repositories\Cart\CartItemEloquentORM;
 use App\Repositories\Cart\CartItemRepositoryInterface;
@@ -18,6 +23,8 @@ use App\Repositories\Order\OrderEloquentORM;
 use App\Repositories\Order\OrderItemEloquentORM;
 use App\Repositories\Order\OrderItemRepositoryInterface;
 use App\Repositories\Order\OrderRepositoryInterface;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -44,5 +51,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        Route::aliasMiddleware('admin', AdminMiddleware::class);
+        Gate::policy(Order::class, OrderBelongsUserPolicy::class);
+        Gate::policy(Cart::class, CartBelongsUserPolicy::class);
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Policies\OrderBelongsUserPolicy;
 use App\Services\OrderService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -59,6 +61,10 @@ class OrderController extends Controller
         try {
 
             $order = $this->orderService->findOne($order->id);
+
+            $userAuthorize = Auth::user();
+            $this->validarOrderUser($userAuthorize, $order);
+
             if (!$order) return response()->json(['error' => 'Pedido não encontrado'], 404);
 
             return response()->json($order);
@@ -86,6 +92,9 @@ class OrderController extends Controller
             $order = $this->orderService->findOne($id);
             if (!$order) return response()->json(['error' => 'Pedido nao encontrado'], 404);
 
+            $userAuthorize = Auth::user();
+            $this->validarOrderUser($userAuthorize, $order);
+
             $this->orderService->update($order->id, (object) $request->toArray());    
             DB::commit();
 
@@ -107,6 +116,9 @@ class OrderController extends Controller
             $order = $this->orderService->findOne($order->id);
             if (!$order) return response()->json(['error' => 'Pedido não encontrado'], 404);
 
+            $userAuthorize = Auth::user();
+            $this->validarOrderUser($userAuthorize, $order);
+
             $this->orderService->delete($order->id);    
             DB::commit();
             return response()->json(null, 204);
@@ -123,7 +135,10 @@ class OrderController extends Controller
 
             $order = $this->orderService->findOne($id);
             if (!$order) return response()->json(['error' => 'Pedido não encontrado'], 404);
-
+            
+            $userAuthorize = Auth::user();
+            $this->validarOrderUser($userAuthorize, $order);
+            
             $this->orderService->updateStatus($order->id, $request->status);    
            
             DB::commit();
@@ -133,5 +148,11 @@ class OrderController extends Controller
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function validarOrderUser($userAuthorize, $order){
+        $policy = new OrderBelongsUserPolicy();
+        if(!$policy->view($userAuthorize, $order))
+            throw new Exception('Não autorizado, esse pedido não pertence ao usuário');
     }
 }

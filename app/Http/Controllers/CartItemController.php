@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Product;
+use App\Policies\CartBelongsUserPolicy;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\CartItemService;
+use App\Services\CartService;
+use App\Services\ProductService;
+use Illuminate\Support\Facades\Auth;
 
 class CartItemController extends Controller
 {
     public function __construct(
-        private CartItemService $cartItensService
+        private CartItemService $cartItensService,
+        private CartService $cartService,
+        private ProductService $productService
     )
     {
     }
@@ -118,9 +125,10 @@ class CartItemController extends Controller
     public function updateAddItem(Request $request) {
         try {
             DB::beginTransaction();
+            $userAuthorize = Auth::user();
 
-            // $product = $this->productService->findOne($request->idProduct);
-            // if (!$product) return response()->json(['error' => 'Não foi encontrado este produto para ser adicionado no carrinho.'], 404);
+            $product = $this->productService->findOne($request->idProduct);
+            if (!$product) return response()->json(['error' => 'Não foi encontrado este produto para ser adicionado no carrinho.'], 404);
               
             if($request->idCart) {
                 $cartItemExistInCart = $this->cartItensService->findOne($request->idCart, $request->idProduct);
@@ -140,5 +148,12 @@ class CartItemController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Não foi possível atualizar o item desse carrinho', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function validarCartItemPertenceUser($userAuthorize, $CartItem){
+        $policy = new CartBelongsUserPolicy();
+        $order = $this->cartService->findOne($CartItem->cart_id);
+        if(!$policy->view($userAuthorize, $order))
+            throw new Exception('Não autorizado, esse pedido não pertence ao usuário');
     }
 }

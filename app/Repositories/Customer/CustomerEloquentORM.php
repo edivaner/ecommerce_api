@@ -52,6 +52,9 @@ class CustomerEloquentORM implements CustomerRepositoryInterface
 
     public function create(CreateCustomerDTO $dto): stdClass
     {
+        // role definido como admin torna o usuario um administrador
+        if($dto->user['role']) $dto->user['role'] = 'user';
+
         $user = $this->user->create((array)$dto->user);
         $address = $this->address->create((array)$dto->address);
 

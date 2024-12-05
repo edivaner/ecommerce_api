@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 use App\Services\CartService;
 use App\DTO\cart\CreateCartDTO;
 use App\DTO\cart\UpdateCartDTO;
+use App\Policies\CartBelongsUserPolicy;
 use App\Services\CartItemService;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -68,10 +70,10 @@ class CartController extends Controller
     public function show(string $id)
     {
         try {
-            $cartItem = $this->cartService->findOne($id);
-            if (!$cartItem) return response()->json(['error' => 'Não foi possível encontrar esse carrinho'], 404);
+            $cart = $this->cartService->findOne($id);
+            if (!$cart) return response()->json(['error' => 'Não foi possível encontrar esse carrinho'], 404);
 
-            return response()->json([$cartItem]);
+            return response()->json([$cart], 200);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Não foi possível encontrar esse carrinho', 'error' => $e->getMessage()], 500);
@@ -113,5 +115,11 @@ class CartController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Não foi possível deletar esse carrinho', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function validarCartPertenceUser($userAuthorize, $cart){
+        $policy = new CartBelongsUserPolicy();
+        if(!$policy->view($userAuthorize, $cart))
+            throw new Exception('Não autorizado, esse pedido não pertence ao usuário');
     }
 }

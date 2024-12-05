@@ -14,6 +14,7 @@ class CreateCustomerDTO
 
     public static function makeFromRequest($request): self
     {
+        if($request->role->role) $request->role = 'user'; 
         $self = new self(
             $request->user,
             $request->address,

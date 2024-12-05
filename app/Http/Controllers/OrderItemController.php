@@ -2,16 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\OrderItem;
+use App\Policies\OrderBelongsUserPolicy;
 use App\Services\OrderItemService;
+use App\Services\OrderService;
+use App\Services\ProductService;
 use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderItemController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
-        private OrderItemService $orderItemService
+        private OrderItemService $orderItemService,
+        private OrderService $orderService,
+        private ProductService $productService
     ) {}
     /**
      * Display a listing of the resource.
@@ -49,10 +59,14 @@ class OrderItemController extends Controller
     public function show(string $idOrder)
     {
         try {
-            $OrderItem = $this->orderItemService->findOne($idOrder); 
-            if (!$OrderItem) return response()->json(['message' => 'Não foi possível encontrar esse pedido'], 404);
+            $orderItem = $this->orderItemService->findOne($idOrder); 
+            if (!$orderItem) return response()->json(['message' => 'Não foi possível encontrar esse pedido'], 404);
 
-            return response()->json([$OrderItem]);
+            $userAuthorize = Auth::user();
+            $this->validarOrderItemUser($userAuthorize, $orderItem);
+
+
+            return response()->json([$orderItem]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Não foi possível encontrar esse pedido', 'error' => $e->getMessage()], 500);
         }
@@ -61,13 +75,23 @@ class OrderItemController extends Controller
     public function showItens(string $idOrder, string $idProduct)
     {
         try {
-            $OrderItem = $this->orderItemService->findOne($idOrder, $idProduct); 
-            if (!$OrderItem) return response()->json(['message' => 'Não foi possível encontrar os itens desse pedido'], 404);
+            $orderItem = $this->orderItemService->findOne($idOrder, $idProduct); 
+            if (!$orderItem) return response()->json(['message' => 'Não foi possível encontrar os itens desse pedido'], 404);
 
-            return response()->json([$OrderItem]);
+            $userAuthorize = Auth::user();
+            $this->validarOrderItemUser($userAuthorize, $orderItem);
+
+            return response()->json([$orderItem]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Não foi possível encontrar os itens desse pedido', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function validarOrderItemUser($userAuthorize, $OrderItem){
+        $policy = new OrderBelongsUserPolicy();
+        $order = $this->orderService->findOne($OrderItem->order_id);
+        if(!$policy->view($userAuthorize, $order))
+            throw new Exception('Não autorizado, esse pedido não pertence ao usuário');
     }
 
     /**
@@ -94,8 +118,11 @@ class OrderItemController extends Controller
         try {
             DB::beginTransaction();
 
-            $cartItem = $this->orderItemService->findOne($idOrder, $idProduct);
-            if (!$cartItem) return response()->json(['error' => 'Não foi encontrado este item do pedido para ser excluido.'], 404);
+            $orderItem = $this->orderItemService->findOne($idOrder, $idProduct);
+            if (!$orderItem) return response()->json(['error' => 'Não foi encontrado este item do pedido para ser excluido.'], 404);
+
+            $userAuthorize = Auth::user();
+            $this->validarOrderItemUser($userAuthorize, $orderItem);
 
             $this->orderItemService->delete($idOrder, $idProduct);
 
@@ -115,6 +142,9 @@ class OrderItemController extends Controller
             $orderItem = $this->orderItemService->findOne($idOrder, $idProduct);
             if (!$orderItem) return response()->json(['error' => 'Não foi encontrado este item do carrinho para ser atualizado.'], 404);
 
+            $userAuthorize = Auth::user();
+            $this->validarOrderItemUser($userAuthorize, $orderItem);
+
             $orderItem = $this->orderItemService->updateQuantity($idOrder, $idProduct, $request->quantity);
 
             DB::commit();
@@ -129,13 +159,16 @@ class OrderItemController extends Controller
         try {
             DB::beginTransaction();
 
-            // $product = $this->productService->findOne($request->idProduct);
-            // if (!$product) return response()->json(['error' => 'Não foi encontrado este produto para ser adicionado no pedido.'], 404);
+            $product = $this->productService->findOne($request->idProduct);
+            if (!$product) return response()->json(['error' => 'Não foi encontrado este produto para ser adicionado no pedido.'], 404);
               
             if($request->idOrder) {
-                $cartItemExistInCart = $this->orderItemService->findOne($request->idOrder, $request->idProduct);
+                $orderItem = $this->orderItemService->findOne($request->idOrder, $request->idProduct);
 
-                if ($cartItemExistInCart) {
+                if ($orderItem) {
+                    $userAuthorize = Auth::user();
+                    $this->validarOrderItemUser($userAuthorize, $orderItem);
+
                     $this->orderItemService->updateQuantity($request->idOrder, $request->idProduct, $request->quantity);
 
                     return response()->json(['message' => 'Item atualizado com sucesso'], 200);
