@@ -47,6 +47,23 @@ services:
     networks:
       - laravel
 
+  # Serviço secundário MySQL para testes
+  mysql_test:
+    image: mysql:5.7.22
+    container_name: mysql_test
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_USER: ${DB_USERNAME:-username}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-userpass}
+    volumes:
+      - mysql-test-data:/var/lib/mysql
+    ports:
+      - "3399:3306" # Porta diferente do banco principal
+    networks:
+      - laravel
+
   # Serviço Redis
   redis:
     image: redis:alpine
@@ -70,6 +87,7 @@ services:
 
 volumes:
   mysql-data:
+  mysql-test-data:
 
 networks:
   laravel:
