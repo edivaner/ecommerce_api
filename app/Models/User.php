@@ -63,6 +63,6 @@ class User extends Authenticatable implements JWTSubject
         $existEmail = self::where('email', $email)->first();
 
         if ($existEmail) 
-            throw new \Exception('Email ja cadastrado');
+            throw new \Exception('Email já cadastrado!');
     }
 }
